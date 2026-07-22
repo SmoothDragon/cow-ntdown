@@ -1,7 +1,6 @@
 import { Fredoka_600SemiBold, Fredoka_700Bold, useFonts } from '@expo-google-fonts/fredoka';
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -182,10 +181,6 @@ export default function App() {
     };
   }, [clearTick]);
 
-  if (!fontsLoaded) {
-    return <View style={styles.loading} />;
-  }
-
   const running = phase === 'running';
   const paused = phase === 'paused';
   const done = phase === 'done';
@@ -196,19 +191,20 @@ export default function App() {
   else if (paused) tagline = 'Paused';
   else if (running) tagline = 'Counting down…';
 
+  const brandFont = fontsLoaded ? 'Fredoka_700Bold' : undefined;
+  const bodyFont = fontsLoaded ? 'Fredoka_600SemiBold' : undefined;
+
   return (
     <View style={styles.root}>
-      <LinearGradient
-        colors={['#FFF9F0', '#F7F2E8', '#E8F0FF']}
-        locations={[0, 0.55, 1]}
-        style={StyleSheet.absoluteFill}
+      <Image
+        source={require('./assets/flying-cow-fullbody.png')}
+        style={styles.background}
+        resizeMode="cover"
+        accessibilityIgnoresInvertColors
       />
+      <View style={styles.scrim} pointerEvents="none" />
 
-      <View style={[styles.patch, styles.patchTL]} />
-      <View style={[styles.patch, styles.patchBR]} />
-      <View style={[styles.patch, styles.patchMid]} />
-
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <Animated.View
         pointerEvents="none"
@@ -220,19 +216,17 @@ export default function App() {
       />
 
       <View style={styles.content}>
-        <Text style={styles.brand}>Cow-ntdown</Text>
-        <Text style={styles.tagline}>{tagline}</Text>
-
-        <Image
-          source={require('./assets/cow-deco.png')}
-          style={styles.cow}
-          resizeMode="contain"
-          accessibilityIgnoresInvertColors
-        />
+        <Text style={[styles.brand, brandFont ? { fontFamily: brandFont } : null]}>
+          Cow-ntdown
+        </Text>
+        <Text style={[styles.tagline, bodyFont ? { fontFamily: bodyFont } : null]}>
+          {tagline}
+        </Text>
 
         <Animated.Text
           style={[
             styles.timer,
+            brandFont ? { fontFamily: brandFont } : null,
             (running || paused) && styles.timerRunning,
             paused && styles.timerPaused,
             done && styles.timerDone,
@@ -254,7 +248,9 @@ export default function App() {
               (pressed || done) && styles.buttonPressed,
             ]}
           >
-            <Text style={styles.buttonLabel}>Start</Text>
+            <Text style={[styles.buttonLabel, brandFont ? { fontFamily: brandFont } : null]}>
+              Start
+            </Text>
           </Pressable>
         )}
 
@@ -271,7 +267,9 @@ export default function App() {
                 pressed && styles.buttonPressed,
               ]}
             >
-              <Text style={styles.buttonLabel}>{paused ? 'Resume' : 'Pause'}</Text>
+              <Text style={[styles.buttonLabel, brandFont ? { fontFamily: brandFont } : null]}>
+                {paused ? 'Resume' : 'Pause'}
+              </Text>
             </Pressable>
             <Pressable
               accessibilityRole="button"
@@ -284,7 +282,9 @@ export default function App() {
                 pressed && styles.buttonPressed,
               ]}
             >
-              <Text style={styles.buttonLabel}>Reset</Text>
+              <Text style={[styles.buttonLabel, brandFont ? { fontFamily: brandFont } : null]}>
+                Reset
+              </Text>
             </Pressable>
           </View>
         )}
@@ -296,83 +296,58 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: '#0B1020',
   },
-  loading: {
-    flex: 1,
-    backgroundColor: '#F7F2E8',
+  background: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+    opacity: 0.85,
+  },
+  scrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(8, 12, 28, 0.18)',
   },
   flashOverlay: {
     backgroundColor: '#FF8FAB',
   },
-  patch: {
-    position: 'absolute',
-    backgroundColor: '#1A1A1A',
-    opacity: 0.07,
-    borderRadius: 999,
-  },
-  patchTL: {
-    width: 220,
-    height: 160,
-    top: -40,
-    left: -60,
-    transform: [{ rotate: '-18deg' }],
-  },
-  patchBR: {
-    width: 260,
-    height: 180,
-    bottom: -50,
-    right: -70,
-    transform: [{ rotate: '22deg' }],
-  },
-  patchMid: {
-    width: 90,
-    height: 70,
-    top: '38%',
-    right: 24,
-    transform: [{ rotate: '12deg' }],
-  },
   content: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
     paddingBottom: 36,
+    zIndex: 2,
   },
   brand: {
-    fontFamily: 'Fredoka_700Bold',
     fontSize: 42,
-    color: '#1A1A1A',
+    color: '#FFFDF8',
     letterSpacing: -0.5,
     marginBottom: 6,
+    fontWeight: '700',
   },
   tagline: {
-    fontFamily: 'Fredoka_600SemiBold',
     fontSize: 16,
-    color: '#5C4A3A',
-    marginBottom: 12,
-  },
-  cow: {
-    width: 280,
-    height: 280,
-    marginBottom: 4,
-    opacity: 0.95,
+    color: '#E8EEFF',
+    marginBottom: 28,
+    fontWeight: '600',
   },
   timer: {
-    fontFamily: 'Fredoka_700Bold',
     fontSize: 80,
-    color: '#1A1A1A',
+    color: '#FFFDF8',
     letterSpacing: 2,
     marginVertical: 8,
     fontVariant: ['tabular-nums'],
+    fontWeight: '700',
   },
   timerRunning: {
-    color: '#2B4C7E',
+    color: '#9EC5FF',
   },
   timerPaused: {
-    color: '#8A6A3A',
+    color: '#F0D9A0',
   },
   timerDone: {
-    color: '#C23B5C',
+    color: '#FF8FAB',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -410,9 +385,9 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   buttonLabel: {
-    fontFamily: 'Fredoka_700Bold',
     fontSize: 22,
     color: '#FFFDF8',
     letterSpacing: 0.5,
+    fontWeight: '700',
   },
 });

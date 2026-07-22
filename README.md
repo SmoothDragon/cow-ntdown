@@ -51,8 +51,15 @@ Turn phone **media** volume up (not just ringer).
 
 ## Branding
 
-Holstein / Cows in Space palette and flying-cow etch deco (`assets/cow-deco.png`).
+Full-screen flying cow (`assets/flying-cow-fullbody.png`) behind the timer, with light type over the dark space scene.
 
-## Store builds
+## Store builds (Android)
 
-Not configured yet. When you want TestFlight / Play: [EAS Build](https://docs.expo.dev/build/introduction/).
+EAS is configured for Android. After logging in (`npx eas-cli login`):
+
+```bash
+npx eas-cli build --platform android --profile production
+npx eas-cli submit --platform android --profile production
+```
+
+Play Console listing, privacy policy URL, and a Google Play developer account are still required before the app is public. iOS is deferred.
